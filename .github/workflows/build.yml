@@ -48,7 +48,7 @@ jobs:
       - name: Download and untar
         run: |
           release_name=$(echo ${{ env.release_name }})
-          curl -o brch.tar.gz https://github.com/sebanc/brunch/releases/download/r131-stable-20241226/brunch_r131_stable_20241226.tar.gz
+          wget -O brch.tar.gz https://github.com/sebanc/brunch/releases/download/r131-stable-20241226/brunch_r131_stable_20241226.tar.gz
           tar -xvzf brch.tar.gz -C cros
       - name: build
         run: |
