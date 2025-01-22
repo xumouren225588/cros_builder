@@ -53,7 +53,7 @@ jobs:
       - name: build
         run: |
           cd cros
-          sudo bash ./chromeos-install.sh -src cros.bin -dst chromeos_${{ env.FLNRA }}.img
+          sudo bash ./chromeos-install.sh -src cros.bin -dst chromeos.img
           gzip -v chromeos.img
       - name: Create Release and Upload Asset
         uses: softprops/action-gh-release@v1
