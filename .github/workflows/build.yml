@@ -1,0 +1,68 @@
+name: Get Brunch Release Name
+on:
+  workflow_dispatch:
+jobs:
+  get_release_name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: install enverment
+        run: |
+          sudo apt update && sudo apt -y install pv cgpt tar unzip
+      - name: download Chrome OS
+        run: |
+          curl -o cros.zip https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_16063.68.0_zork_recovery_stable-channel_mp-v10.bin.zip
+      - name: unzip
+        run: |
+          unzip cros.zip -d cros
+      - name: Find and Rename .bin File
+        run: |
+          # 定义目标文件夹路径
+          target_folder="cros"  # 替换为你的目标文件夹路径
+
+          # 找到第一个 .bin 文件
+          first_bin_file=$(find "$target_folder" -type f -name "*.bin" | head -n 1)
+
+          # 检查是否找到文件
+          if [ -z "$first_bin_file" ]; then
+            echo "No .bin file found in $target_folder"
+            exit 1  # 如果没有找到文件，退出工作流
+          else
+            echo "Found .bin file: $first_bin_file"
+            # 重命名为 cros.bin
+            mv "$first_bin_file" "$target_folder/cros.bin"
+          fi
+      - name: Get Releases
+        id: get_releases
+        run: |
+          temp_file=$(mktemp)
+          curl -s https://api.github.com/repos/sebanc/brunch/releases -o $temp_file
+          echo "temp_file=$temp_file" >> $GITHUB_ENV
+
+      - name: Filter Release Name
+        id: filter_release_name
+        run: |
+          temp_file=$(echo ${{ env.temp_file }})
+          release_name=$(jq -r '.[] | select(.tag_name | startswith("r131-stable-")) | .tag_name' $temp_file | head -n 1)
+          echo "release_name=$release_name" >> $GITHUB_ENV
+
+      - name: Download and untar
+        run: |
+          release_name=$(echo ${{ env.release_name }})
+          curl -o brch.tar.gz https://github.com/sebanc/brunch/releases/download/r131-stable-20241226/brunch_r131_stable_20241226.tar.gz
+          tar -xvzf brch.tar.gz -C cros
+      - name: build
+        run: |
+          cd cros
+          FLNRA=$(openssl rand -base64 8)
+          echo "FLNRA=$FLNRA" >> $GITHUB_ENV
+          sudo bash ./chromeos-install.sh -src cros.bin -dst chromeos_${{ env.FLNRA }}.img
+          gzip chromeos_${{ env.FLNRA }}.img
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            cros/chromeos_${{ env.FLNRA }}.img
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+          
