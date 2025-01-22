@@ -8,20 +8,18 @@ jobs:
       - name: Get Releases
         id: get_releases
         run: |
-          releases=$(curl -s https://api.github.com/repos/sebanc/brunch/releases)
-          echo "releases<<EOF" >> $GITHUB_ENV
-          echo "$releases" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          temp_file=$(mktemp)
+          curl -s https://api.github.com/repos/sebanc/brunch/releases -o $temp_file
+          echo "temp_file=$temp_file" >> $GITHUB_ENV
+
       - name: Filter Release Name
         id: filter_release_name
         run: |
-          temp_file=$(mktemp)
-          echo "$releases" > $temp_file
+          temp_file=$(echo ${{ env.temp_file }})
           release_name=$(jq -r '.[] | select(.tag_name | startswith("r131-stable-")) | .tag_name' $temp_file | head -n 1)
-          rm $temp_file
-          echo "release_name<<EOF" >> $GITHUB_ENV
-          echo "$release_name" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "release_name=$release_name" >> $GITHUB_ENV
+
       - name: Print Release Name
         run: |
+          release_name=$(echo ${{ env.release_name }})
           echo "The first release name starting with 'r131-stable-' is: $release_name"
