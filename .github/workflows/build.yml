@@ -53,15 +53,13 @@ jobs:
       - name: build
         run: |
           cd cros
-          FLNRA=$(openssl rand -base64 8)
-          echo "FLNRA=$FLNRA" >> $GITHUB_ENV
           sudo bash ./chromeos-install.sh -src cros.bin -dst chromeos_${{ env.FLNRA }}.img
-          gzip chromeos_${{ env.FLNRA }}.img
+          gzip -v chromeos.img
       - name: Create Release and Upload Asset
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            cros/chromeos_${{ env.FLNRA }}.img
+            cros/chromeos.img.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
