@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 jobs:
   get_release_name:
-    runs-on: ubuntu - latest
+    runs-on: ubuntu-latest
     steps:
       - name: Get Releases
         id: get_releases
