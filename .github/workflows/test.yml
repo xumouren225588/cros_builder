@@ -15,10 +15,13 @@ jobs:
       - name: Filter Release Name
         id: filter_release_name
         run: |
-          release_name=$(echo "$releases" | jq -r '.[] | select(.tag_name | startswith("r131 - stable -")) |.tag_name' | head -n 1)
+          temp_file=$(mktemp)
+          echo "$releases" > $temp_file
+          release_name=$(jq -r '.[] | select(.tag_name | startswith("r131-stable-")) | .tag_name' $temp_file | head -n 1)
+          rm $temp_file
           echo "release_name<<EOF" >> $GITHUB_ENV
           echo "$release_name" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       - name: Print Release Name
         run: |
-          echo "The first release name starting with 'r131 - stable -' is: $release_name"
+          echo "The first release name starting with 'r131-stable-' is: $release_name"
