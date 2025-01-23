@@ -55,13 +55,9 @@ jobs:
           cd cros
           sudo bash ./chromeos-install.sh -src cros.bin -dst chromeos.img
           gzip -v chromeos.img
-      - name: Create Release and Upload Asset
-        uses: softprops/action-gh-release@v1
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4  # 使用 upload-artifact Action
         with:
-          tag_name: build
-          files: |
-            cros/chromeos.img.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+          name: chromeos  # 工件名称
+          path: cros/chromeos.img.gz  # 要上传的文件路径
           
