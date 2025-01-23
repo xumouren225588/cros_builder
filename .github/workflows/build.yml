@@ -10,7 +10,7 @@ jobs:
           sudo apt update && sudo apt -y install pv cgpt tar unzip
       - name: download Chrome OS
         run: |
-          curl -o cros.zip https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_16063.68.0_zork_recovery_stable-channel_mp-v10.bin.zip
+          curl -o cros.zip https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_16063.68.0_rammus_recovery_stable-channel_mp-v5.bin.zip
       - name: unzip
         run: |
           unzip cros.zip -d cros
