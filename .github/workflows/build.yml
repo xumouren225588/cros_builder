@@ -11,6 +11,13 @@ jobs:
   get_release_name:
     runs-on: ubuntu-latest
     steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+
       - name: install enverment
         run: |
           sudo apt update && sudo apt -y install pv cgpt tar unzip
@@ -20,6 +27,7 @@ jobs:
       - name: unzip
         run: |
           unzip cros.zip -d cros
+          rm -f cros.zip
       - name: Find and Rename .bin File
         run: |
           # 定义目标文件夹路径
@@ -42,6 +50,7 @@ jobs:
         run: |
           wget -O brch.tar.gz ${{ github.event.inputs.brunch_url }}
           tar -xvzf brch.tar.gz -C cros
+          rm -f brch.tar.gz
       - name: build
         run: |
           cd cros
