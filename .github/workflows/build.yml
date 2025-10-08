@@ -1,4 +1,4 @@
-name: Get Brunch Release Name
+name: Build ChromeOS image
 on:
   workflow_dispatch:
     inputs:
